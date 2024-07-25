@@ -46,10 +46,51 @@ average_steps <- activity %>%
 
 str(average_steps)
 
-#Create a times series plot
+#Creating a times series plot
 ggplot(average_steps, aes(x = interval, y = avg_steps)) +
         geom_line() +
         labs(title = "Average Number of Steps per 5-Minute Interval",
              x = "5-Minute Interval",
              y = "Average Number of Steps")
-       
+
+#Calculating which day has the maximum average step 
+# Find the interval with the maximum average steps
+max_interval <- average_steps %>%
+        filter(avg_steps == max(avg_steps, na.rm = TRUE))
+
+print(max_interval)
+#ANSWER = interval 835
+
+
+#######IMPUTING MISSING VALUES
+
+##1.calculating the total number of rows with missing values
+total.na <- sum(is.na(activity$steps))
+
+print(total.na)      
+
+# 2. Impute missing values with the previous line's information
+NA_filled <- activity %>%
+        fill(steps, .direction = "up")
+
+# Print the result
+print(NA_filled)
+
+# Custom function to fill NA with previous non-NA and non-zero value
+fill_na_with_previous_nonzero <- function(x) {
+        last_value <- NA
+        for (i in seq_along(x)) {
+                if (is.na(x[i])) {
+                        x[i] <- last_value
+                } else if (x[i] != 0) {
+                        last_value <- x[i]
+                }
+        }
+        return(x)
+}
+
+# Apply the function to the 'steps' column
+NA_filled <- fill_na_with_previous_nonzero(activity$steps)
+
+# Print the result
+print(NA_filled)
